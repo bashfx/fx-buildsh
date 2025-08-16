@@ -35,7 +35,7 @@ read_build_map() {
             local num="${BASH_REMATCH[1]}"
             local target="${BASH_REMATCH[2]// /}"  # Remove spaces
             build_map_targets["$num"]="$target"
-            printf "  %s%02d%s → %s\n" "$green" "$((10#$num))" "$x" "$target"
+            printf "  %s%s%s → %s\n" "$green" "$num" "$x" "$target"
         fi
     done < "$BUILD_MAP"
     
@@ -56,14 +56,26 @@ rename_from_build_map() {
     
     printf "\n%sRenaming files according to build map...%s\n" "$yellow" "$x"
     
+    # Get all .sh files in parts directory
+    local all_files=()
+    while IFS= read -r -d '' file; do
+        all_files+=("$(basename "$file")")
+    done < <(find "$PARTS_DIR" -name "*.sh" -print0)
+    
+    printf "%sDEBUG:%s Found %d files: %s\n" "$blue" "$x" "${#all_files[@]}" "${all_files[*]}"
+    
+    # Process each build map target
     for num in "${!build_map_targets[@]}"; do
         local target="${build_map_targets[$num]}"
         
-        # Look for any file starting with the number in the parts directory
+        # Find file containing this number
         local found_source=""
-        for file in "$PARTS_DIR"/*"$num"*.sh; do
-            if [[ -f "$file" && "$(basename "$file")" =~ ^.*${num}.*\.sh$ ]]; then
-                found_source="$(basename "$file")"
+        for i in "${!all_files[@]}"; do
+            local file="${all_files[$i]}"
+            if [[ "$file" =~ [^0-9]${num}[^0-9] ]] || [[ "$file" =~ ^${num}[^0-9] ]] || [[ "$file" =~ [^0-9]${num}$ ]]; then
+                found_source="$file"
+                # Remove from array (mark as processed)
+                unset all_files[$i]
                 break
             fi
         done
@@ -73,15 +85,26 @@ rename_from_build_map() {
             local target_path="$PARTS_DIR/$target"
             
             if [[ "$found_source" != "$target" ]]; then
+                [[ -f "$target_path" ]] && rm -f "$target_path"
                 mv "$source_path" "$target_path"
                 printf "  %s✓%s %s → %s\n" "$green" "$x" "$found_source" "$target"
             else
-                printf "  %s=%s %s (already correct)\n" "$blue" "$x" "$target"
+                printf "  %s=%s %s (correct)\n" "$blue" "$x" "$target"
             fi
         else
-            printf "  %s✗%s No source file found for %02d in %s/\n" "$red" "$x" "$((10#$num))" "$PARTS_DIR"
+            printf "  %s✗%s No source for %s\n" "$red" "$x" "$num"
         fi
     done
+    
+    # Clean up unprocessed files with numbers
+    for file in "${all_files[@]}"; do
+        if [[ -n "$file" && "$file" =~ [0-9] ]]; then
+            printf "  %s🗑%s  Removing invalid: %s\n" "$red" "$x" "$file"
+            rm -f "$PARTS_DIR/$file"
+        fi
+    done
+    
+    printf "\n%s✓ Rename complete!%s\n" "$green" "$x"
 }
 
 main() {
@@ -120,8 +143,8 @@ main() {
         while IFS= read -r -d '' file; do
             local basename_file
             basename_file=$(basename "$file")
-            # Check if file matches pattern: NN_*.sh (where NN is 2+ digits)
-            if [[ "$basename_file" =~ ^[0-9]{2,}_.*\.sh$ ]]; then
+            # Check if file matches pattern: N+_*.sh (where N+ is 1+ digits)
+            if [[ "$basename_file" =~ ^[0-9]+_.*\.sh$ ]]; then
                 modules+=("$basename_file")
             fi
         done < <(find "$PARTS_DIR" -name "[0-9]*_*.sh" -print0 | sort -z)
@@ -347,7 +370,7 @@ if [[ "$list_only" == true ]]; then
         while IFS= read -r -d '' file; do
             local basename_file
             basename_file=$(basename "$file")
-            if [[ "$basename_file" =~ ^[0-9]{2,}_.*\.sh$ ]]; then
+            if [[ "$basename_file" =~ ^[0-9]+_.*\.sh$ ]]; then
                 modules+=("$basename_file")
             fi
         done < <(find "$PARTS_DIR" -name "[0-9]*_*.sh" -print0 | sort -z)
