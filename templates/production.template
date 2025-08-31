@@ -1,0 +1,19 @@
+# Production Deployment Template
+# This template configures production-specific deployment settings
+
+# Override default settings for production
+create_wrapper=true
+backup_existing=true
+config_deployment=true
+
+# Production-specific environment variables
+DEPLOY_ENV="production"
+LOG_LEVEL="info"
+
+# Custom notification settings (if your app supports them)
+NOTIFY_ON_DEPLOY="true"
+NOTIFY_EMAIL="admin@example.com"
+
+# Template variables will be substituted:
+# $ORG, $NAMESPACE, $ENVIRONMENT, $PROJECT_NAME, $PROJECT_VERSION
+echo "Deploying $PROJECT_NAME $PROJECT_VERSION to $ORG/$NAMESPACE for $ENVIRONMENT"

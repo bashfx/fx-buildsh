@@ -1,0 +1,6 @@
+# Quarantine metadata
+quarantined_at=2025-08-31 20:27:35
+original_path=parts/06_conflict.sh
+reason=remap_cleanup
+quarantine_path=parts/.invalid/06_conflict.sh
+file_stats=mode=664 size=66 mtime=1756672033

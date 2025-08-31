@@ -1,5 +1,8 @@
-# Build Map - Updated by build.sh swap
+# Build Map - Updated by build.sh insert
 # Format: NN : target_filename.sh
 
+01 : 01_header.sh
 02 : 02_core.sh
 03 : 03_test_module.sh
+04 : 04_stderr.sh
+05 : 05_test_module.sh
