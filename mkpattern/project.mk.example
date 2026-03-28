@@ -1,0 +1,13 @@
+# project.mk (example) — repository-specific configuration for generic makefile
+
+# Binary/install locations
+BINARY_NAME := myapp
+INSTALL_DIR := $(HOME)/.local/bin
+
+# semv integration knobs
+SEMV_MIN_SUPPORT := 1.0.0
+SEMV_COMPAT := min
+SEMV_AUTO_INIT := 0
+
+# Bash files to sync version with semv (optional)
+SEMV_BASH_FILES := bin/deploy.sh bin/run.sh

@@ -1,0 +1,10 @@
+# makefile-project.mk (example) — optional repo-specific targets
+PROJ_UNAVAIL := 0
+
+.PHONY: project.info project.package
+
+project.info:
+	@echo "Project targets active for repo: $(notdir $(CURDIR))"
+
+project.package:
+	@echo "Packaging $(notdir $(CURDIR)) (example target)"
