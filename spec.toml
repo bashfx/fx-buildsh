@@ -1,0 +1,34 @@
+[repo]
+uid = "repo_bb0509b52543b7931c0b"
+id = "bashfx/fx-buildsh"
+name = "fx-buildsh"
+kind = "tool"
+lifecycle = "active"
+
+[[capabilities]]
+name = "file.compose"
+module = "build.sh"
+class = "tool"
+tags = ["bashfx", "parts", "build-map", "assembly", "modules"]
+stability = "working"
+
+[[capabilities]]
+name = "file.transform"
+module = "build.sh"
+class = "tool"
+tags = ["insert", "swap", "renumber", "remap", "list-caveat"]
+stability = "experimental"
+
+[[capabilities]]
+name = "file.validate"
+module = "build.sh"
+class = "tool"
+tags = ["path-safety", "module", "syntax-check", "blocked-paths"]
+stability = "working"
+
+[[capabilities]]
+name = "process.manage"
+module = "build.sh"
+class = "adapter"
+tags = ["install", "uninstall", "deploy", "xdg", "lifecycle"]
+stability = "experimental"
